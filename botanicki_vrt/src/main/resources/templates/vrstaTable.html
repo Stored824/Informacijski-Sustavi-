@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Prikaz Vrsti</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+
+</head>
+<body>
+<h1>Vrste</h1>
+<a th:href="@{dodajVrstu}" class="btn btn-primary">Dodaj Vrstu</a>
+
+
+<table class="table table-success table-striped-columns">
+    <thead>
+    <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Ime</th>
+        <th scope="col">Maks Zrela visina</th>
+        <th scope="col">Maks Zrela tezina</th>
+        <th scope="col">Dob Sazrijevanja</th>
+        <th scope="col">Min Datum Usjeva</th>
+        <th scope="col">Max Datum Usjeva</th>
+        <th scope="col">Detail</th>
+        <th scope="col">Brisanje</th>
+
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="vrsta: ${vrstaTable}">
+        <td th:text="${vrsta.vrstaID}"></td>
+        <td th:text="${vrsta.imevrste}"></td>
+        <td th:text="${vrsta.maksimalnazrelavisina}"></td>
+        <td th:text="${vrsta.maksimalnazrelatezina}"></td>
+        <td th:text="${vrsta.dobsazrijevanja}"></td>
+        <td th:text="${vrsta.mindatumusjeva}"></td>
+        <td th:text="${vrsta.maxdatumusjeva}"></td>
+        <td> <a th:href="@{detail/{id}(id=${vrsta.vrstaID})}" class="btn btn-primary">Detaljni Pregled Vrste</a> </td>
+       <td> <a th:href="@{obrisiVrstu/{id}(id=${vrsta.vrstaID})}" class="btn btn-primary">Obrisi ovu Vrstu</a> </td>
+
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

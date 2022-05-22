@@ -1,0 +1,36 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Izmjeni Vrstu</title>
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+          integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l"
+          crossorigin="anonymous" />
+</head>
+<body>
+
+<div class="container">
+
+    <h3>Izmjeni Vrstu</h3>
+    <hr/>
+
+    <form th:action="@{spremiVrstu}" th:object="${vrsta}" method="POST">
+
+        <input type="text" th:field="*{imevrste}"  name="imevrste" class="form-control col-4 mb-4" placeholder="Ime Vrste" />
+        <input type="text" th:field="*{maksimalnazrelavisina}" name="maksimalnazrelavisina" class="form-control col-4 mb-4" placeholder="Maksimalna Zrela Visina">
+        <input type="text" th:field="*{maksimalnazrelatezina}"  name="maksimalnazrelavisina" class="form-control col-4 mb-4" placeholder="Maksimalna Zrela Tezina" />
+        <input type="text" th:field="*{dobsazrijevanja}" name="dobsazrijevanja" class="form-control col-4 mb-4" placeholder="Dob Sazrijevanja:">
+        <input type="date" th:field="*{mindatumusjeva}"  name="mindatumusjeva" class="form-control col-4 mb-4" placeholder="Min Datum Usjeva" />
+        <input type="date" th:field="*{maxdatumusjeva}" name="maxdatumusjeva" class="form-control col-4 mb-4" placeholder="Max Datum Usjeva">
+        <button type="submit" class="btn btn-primary col-2">Spremi</button>
+        <input type="hidden" name="VrstaID" th:field="*{VrstaID}" />
+
+    </form>
+
+    <hr/>
+    <a th:href="@{vrstaTable} " class="btn btn-primary">Natrag na popis</a>
+</div>
+
+</body>
+</html>
