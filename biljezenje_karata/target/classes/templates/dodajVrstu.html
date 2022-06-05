@@ -1,0 +1,31 @@
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Dodaj Vrstu</title>
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+          integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l"
+          crossorigin="anonymous" />
+</head>
+<body>
+
+<div class="container">
+
+    <h3>Dodaj Novu Vrstu</h3>
+    <hr/>
+
+    <form th:action="@{spremiVrstu}" th:object="${vrsta}" method="POST">
+
+        <input type="text" th:field="*{imevrste}"  name="imevrste" class="form-control col-4 mb-4" placeholder="Ime Vrste" />
+        <button type="submit" class="btn btn-primary col-2">Spremi</button>
+
+    </form>
+
+    <hr/>
+    <a th:href="@{vrstaTable} " class="btn btn-primary">Natrag na popis</a>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,33 @@
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Dodaj Jedinku</title>
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+          integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l"
+          crossorigin="anonymous" />
+</head>
+<body>
+
+<div class="container">
+
+    <h3>Dodaj Novu Jedinku</h3>
+    <hr/>
+
+    <form th:action="@{spremiJedinku}" th:object="${jedinka}" method="POST">
+
+        <input type="text" th:field="*{ime}"  name="ime" class="form-control col-4 mb-4" placeholder="Ime:" />
+        <input type="text" th:field="*{dob}" name="dob" class="form-control col-4 mb-4" placeholder="Dob:">
+        <button type="submit" class="btn btn-primary col-2">Spremi</button>
+        <input type="hidden" name="JedinkaID" th:field="*{JedinkaID}" />
+
+    </form>
+
+    <hr/>
+    <a th:href="@{jedinkaTable} " class="btn btn-primary">Natrag na popis</a>
+</div>
+
+</body>
+</html>

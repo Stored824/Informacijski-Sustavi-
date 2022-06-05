@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Poslovi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+
+</head>
+<body>
+<p>Trenutni posao:</p>
+<p th:text="${posao}"></p>
+<a th:href="@{/biljeter}" class="btn btn-primary">Povratak na pocetnu stranicu</a>
+<a th:href="@{/biljeter/obavi}" class="btn btn-primary">Ispuni trenutni zadatak</a>
+</body>
+</html>

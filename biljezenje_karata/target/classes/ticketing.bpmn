@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_033sdy5" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.0.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.17.0">
+  <bpmn:process id="Ticketing" name="Ticketing" isExecutable="true">
+    <bpmn:documentation>Sustav za biljezenje ulaznica botanickog vrta.</bpmn:documentation>
+    <bpmn:startEvent id="approach" name="Patron Approaches the Ticket inspector">
+      <bpmn:outgoing>Flow_1jdb8yr</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_1jdb8yr" sourceRef="approach" targetRef="Activity_0kpjpee" />
+    <bpmn:sequenceFlow id="Flow_12jwbdn" sourceRef="Activity_0kpjpee" targetRef="TaskScanQRCode" />
+    <bpmn:eventBasedGateway id="DatabaseReplyStatus" name="Database reply status">
+      <bpmn:incoming>Flow_1mfutkb</bpmn:incoming>
+      <bpmn:outgoing>Flow_00d7adg</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1b1o8bf</bpmn:outgoing>
+    </bpmn:eventBasedGateway>
+    <bpmn:intermediateCatchEvent id="TimeEvent" name="Reply from database takes too long">
+      <bpmn:extensionElements />
+      <bpmn:incoming>Flow_00d7adg</bpmn:incoming>
+      <bpmn:outgoing>Flow_1nh88se</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_0neonw1">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT30S</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:sequenceFlow id="Flow_00d7adg" sourceRef="DatabaseReplyStatus" targetRef="TimeEvent" />
+    <bpmn:sequenceFlow id="Flow_1b1o8bf" sourceRef="DatabaseReplyStatus" targetRef="DatabaseMessage" />
+    <bpmn:exclusiveGateway id="VerificationGateway" name="Verification">
+      <bpmn:incoming>Flow_1x1te3g</bpmn:incoming>
+      <bpmn:outgoing>Flow_1ojxzek</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1ivz91t</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_1ojxzek" name="Ticket is Valid" sourceRef="VerificationGateway" targetRef="Activity_1o16mfc">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${isValid}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1ivz91t" name="Ticket is Invalid" sourceRef="VerificationGateway" targetRef="Activity_1fhzmev">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${isValid==false}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:manualTask id="Activity_0kpjpee" name="Ask for ticket">
+      <bpmn:extensionElements />
+      <bpmn:incoming>Flow_1jdb8yr</bpmn:incoming>
+      <bpmn:outgoing>Flow_12jwbdn</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:userTask id="TaskScanQRCode" name="Scan QR code" camunda:assignee="andro" camunda:candidateUsers="Biljeter" camunda:candidateGroups="Biljeter">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="QRCodeScanning" label="Scan" type="long" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_12jwbdn</bpmn:incoming>
+      <bpmn:outgoing>Flow_1mfutkb</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:manualTask id="Activity_1o16mfc" name="Let Patron into the Botanical Garden">
+      <bpmn:incoming>Flow_1ojxzek</bpmn:incoming>
+      <bpmn:outgoing>Flow_19h174k</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:manualTask id="Activity_1fhzmev" name="Ban the Patron from Botanical Garden">
+      <bpmn:incoming>Flow_1ivz91t</bpmn:incoming>
+      <bpmn:outgoing>Flow_1w1gepm</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:sequenceFlow id="Flow_1nh88se" sourceRef="TimeEvent" targetRef="TaskInform" />
+    <bpmn:endEvent id="Event_1bmb5hb">
+      <bpmn:incoming>Flow_11guksj</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_11guksj" sourceRef="TaskInform" targetRef="Event_1bmb5hb" />
+    <bpmn:userTask id="TaskInform" name="Inform System Error" camunda:assignee="andro" camunda:candidateGroups="Biljeter">
+      <bpmn:incoming>Flow_1nh88se</bpmn:incoming>
+      <bpmn:outgoing>Flow_11guksj</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:intermediateCatchEvent id="DatabaseMessage" name="DatabaseMessage" camunda:asyncBefore="true" camunda:asyncAfter="true">
+      <bpmn:extensionElements />
+      <bpmn:incoming>Flow_1b1o8bf</bpmn:incoming>
+      <bpmn:outgoing>Flow_04wrf3l</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1rboezy" messageRef="Message_3dl2t7h" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:sequenceFlow id="Flow_04wrf3l" sourceRef="DatabaseMessage" targetRef="VerifyDatabase" />
+    <bpmn:sequenceFlow id="Flow_1x1te3g" sourceRef="VerifyDatabase" targetRef="VerificationGateway" />
+    <bpmn:sequenceFlow id="Flow_1mfutkb" sourceRef="TaskScanQRCode" targetRef="DatabaseReplyStatus" />
+    <bpmn:userTask id="VerifyDatabase" name="Verify Database reply" camunda:assignee="andro" camunda:candidateGroups="Biljeter">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="isValid" label="isValid" type="boolean" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_04wrf3l</bpmn:incoming>
+      <bpmn:outgoing>Flow_1x1te3g</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gateway_1y86qzf">
+      <bpmn:incoming>Flow_19h174k</bpmn:incoming>
+      <bpmn:incoming>Flow_1w1gepm</bpmn:incoming>
+      <bpmn:outgoing>Flow_1erb0zg</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_19h174k" sourceRef="Activity_1o16mfc" targetRef="Gateway_1y86qzf" />
+    <bpmn:sequenceFlow id="Flow_1w1gepm" sourceRef="Activity_1fhzmev" targetRef="Gateway_1y86qzf" />
+    <bpmn:sequenceFlow id="Flow_1erb0zg" sourceRef="Gateway_1y86qzf" targetRef="Event_00cxsvt" />
+    <bpmn:endEvent id="Event_00cxsvt">
+      <bpmn:incoming>Flow_1erb0zg</bpmn:incoming>
+    </bpmn:endEvent>
+  </bpmn:process>
+  <bpmn:signal id="Signal_038am3t" name="Database reply received" />
+  <bpmn:message id="Message_3dl2t7h" name="DatabaseMessage" />
+  <bpmn:message id="Message_1lrcmfu" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Ticketing">
+      <bpmndi:BPMNEdge id="Flow_1erb0zg_di" bpmnElement="Flow_1erb0zg">
+        <di:waypoint x="1235" y="360" />
+        <di:waypoint x="1322" y="360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1w1gepm_di" bpmnElement="Flow_1w1gepm">
+        <di:waypoint x="1250" y="490" />
+        <di:waypoint x="1250" y="438" />
+        <di:waypoint x="1210" y="438" />
+        <di:waypoint x="1210" y="385" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_19h174k_di" bpmnElement="Flow_19h174k">
+        <di:waypoint x="1100" y="250" />
+        <di:waypoint x="1210" y="250" />
+        <di:waypoint x="1210" y="335" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1mfutkb_di" bpmnElement="Flow_1mfutkb">
+        <di:waypoint x="550" y="250" />
+        <di:waypoint x="570" y="250" />
+        <di:waypoint x="570" y="137" />
+        <di:waypoint x="675" y="137" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1x1te3g_di" bpmnElement="Flow_1x1te3g">
+        <di:waypoint x="690" y="510" />
+        <di:waypoint x="768" y="510" />
+        <di:waypoint x="768" y="470" />
+        <di:waypoint x="845" y="470" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_04wrf3l_di" bpmnElement="Flow_04wrf3l">
+        <di:waypoint x="790" y="268" />
+        <di:waypoint x="790" y="369" />
+        <di:waypoint x="640" y="369" />
+        <di:waypoint x="640" y="470" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_11guksj_di" bpmnElement="Flow_11guksj">
+        <di:waypoint x="1020" y="137" />
+        <di:waypoint x="1172" y="137" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1nh88se_di" bpmnElement="Flow_1nh88se">
+        <di:waypoint x="808" y="137" />
+        <di:waypoint x="920" y="137" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ivz91t_di" bpmnElement="Flow_1ivz91t">
+        <di:waypoint x="870" y="495" />
+        <di:waypoint x="870" y="530" />
+        <di:waypoint x="1200" y="530" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="973" y="553" width="74" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ojxzek_di" bpmnElement="Flow_1ojxzek">
+        <di:waypoint x="870" y="445" />
+        <di:waypoint x="870" y="423" />
+        <di:waypoint x="1050" y="423" />
+        <di:waypoint x="1050" y="290" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="917" y="403" width="66" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1b1o8bf_di" bpmnElement="Flow_1b1o8bf">
+        <di:waypoint x="700" y="162" />
+        <di:waypoint x="700" y="250" />
+        <di:waypoint x="772" y="250" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_00d7adg_di" bpmnElement="Flow_00d7adg">
+        <di:waypoint x="725" y="137" />
+        <di:waypoint x="772" y="137" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_12jwbdn_di" bpmnElement="Flow_12jwbdn">
+        <di:waypoint x="330" y="190" />
+        <di:waypoint x="330" y="250" />
+        <di:waypoint x="450" y="250" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1jdb8yr_di" bpmnElement="Flow_1jdb8yr">
+        <di:waypoint x="208" y="137" />
+        <di:waypoint x="244" y="137" />
+        <di:waypoint x="244" y="150" />
+        <di:waypoint x="280" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="approach">
+        <dc:Bounds x="172" y="119" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="153" y="162" width="77" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_101cryl_di" bpmnElement="DatabaseReplyStatus">
+        <dc:Bounds x="675" y="112" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="663" y="82" width="75" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0v3b51r_di" bpmnElement="TimeEvent">
+        <dc:Bounds x="772" y="119" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="753" y="76" width="76" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1pcjpf1_di" bpmnElement="VerificationGateway" isMarkerVisible="true">
+        <dc:Bounds x="845" y="445" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="905" y="463" width="53" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0liwvpx_di" bpmnElement="Activity_0kpjpee">
+        <dc:Bounds x="280" y="110" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_100c3ck_di" bpmnElement="TaskScanQRCode">
+        <dc:Bounds x="450" y="210" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0mzkdl2_di" bpmnElement="Activity_1o16mfc">
+        <dc:Bounds x="1000" y="210" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0dwfuxd_di" bpmnElement="Activity_1fhzmev">
+        <dc:Bounds x="1200" y="490" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1bmb5hb_di" bpmnElement="Event_1bmb5hb">
+        <dc:Bounds x="1172" y="119" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1tvchlw_di" bpmnElement="TaskInform">
+        <dc:Bounds x="920" y="97" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1hl01nt_di" bpmnElement="DatabaseMessage">
+        <dc:Bounds x="772" y="232" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="807" y="237" width="86" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1qg06pg_di" bpmnElement="VerifyDatabase">
+        <dc:Bounds x="590" y="470" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1y86qzf_di" bpmnElement="Gateway_1y86qzf" isMarkerVisible="true">
+        <dc:Bounds x="1185" y="335" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1hxckkr_di" bpmnElement="Event_00cxsvt">
+        <dc:Bounds x="1322" y="342" width="36" height="36" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
